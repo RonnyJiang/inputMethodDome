@@ -1,0 +1,49 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        applicationId "pub.lemon.ronnyimetest"
+        minSdkVersion 9
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        android.applicationVariants.all { variant ->
+            variant.outputs.each { output ->
+                def alignedOutputFile = output.outputFile
+                if (alignedOutputFile != null && alignedOutputFile.name.endsWith('.apk')) {
+                    def fileName = alignedOutputFile.name.replace("app", "${defaultConfig.applicationId}")
+                    if ("release" == variant.buildType.name) {
+                        fileName = fileName.replace("-" + variant.buildType.name, "");
+                    }
+                    output.outputFile = new File(alignedOutputFile.parent, fileName)
+                }
+                def unalignedOutputFile = output.packageApplication.outputFile
+                if (unalignedOutputFile != null && unalignedOutputFile.name.endsWith('.apk')) {
+                    def unalignedFileName = unalignedOutputFile.name.replace("app", "${defaultConfig.applicationId}")
+                    if ("release" == variant.buildType.name) {
+                        unalignedFileName = unalignedFileName.replace("-" + variant.buildType.name, "");
+                    }
+                    output.packageApplication.outputFile = new File(unalignedOutputFile.parent, unalignedFileName)
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:25.1.1'
+    testCompile 'junit:junit:4.12'
+}
